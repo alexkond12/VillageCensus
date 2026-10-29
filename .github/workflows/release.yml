@@ -1,0 +1,59 @@
+# Publishes a GitHub release when a version tag (e.g. v1.0.0) is pushed:
+# builds every loader for every supported Minecraft version and attaches the 9 jars.
+name: Release
+
+on:
+  push:
+    tags: [ "v*" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        mc: [ "26.1.2", "26.2", "26.3" ]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check that the tag matches mod_version
+        run: |
+          version="$(grep '^mod_version=' gradle.properties | cut -d= -f2)"
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match mod_version=${version} in gradle.properties"
+            exit 1
+          fi
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Build (Minecraft ${{ matrix.mc }})
+        run: ./gradlew build -Pmc_target=${{ matrix.mc }}
+      - uses: actions/upload-artifact@v5
+        with:
+          name: jars-mc${{ matrix.mc }}
+          path: dist/*.jar
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: jars-*
+          merge-multiple: true
+          path: dist
+      - name: Write release notes
+        run: ./scripts/release-notes.sh "${GITHUB_REF_NAME#v}" > release-notes.md
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/*.jar \
+            --title "Village Census ${GITHUB_REF_NAME#v}" \
+            --notes-file release-notes.md \
+            --verify-tag

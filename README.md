@@ -57,6 +57,9 @@ The translations were written without review by native speakers. Corrections are
 
 ## Download / install
 
+Get the jar for your loader and Minecraft version from the
+[**Releases**](https://github.com/alexkond12/VillageCensus/releases/latest) page.
+
 | Minecraft | Fabric | NeoForge | Forge |
 |---|---|---|---|
 | 26.3   | `villagecensus-fabric-1.0.0+mc26.3.jar` | `villagecensus-neoforge-1.0.0+mc26.3.jar` | `villagecensus-forge-1.0.0+mc26.3.jar` |
@@ -130,8 +133,8 @@ VillageCensus/
 ├── fabric/   neoforge/   forge/        ← only the entry point + registration + one event each
 ├── versions/<mc>.properties            ← dependency versions per Minecraft version
 ├── build-logic/                        ← shared Gradle conventions
-├── scripts/                            ← build-all, one-time git setup, translation generator
-├── ci/github-workflow-build.yml        ← GitHub Actions workflow (installed by scripts/setup-git)
+├── scripts/                            ← build-all, release notes, translation generator
+├── .github/workflows/                  ← CI: build.yml (every push), release.yml (version tags)
 ├── docs/TESTING.md                     ← in-game test checklist
 ├── docs/gallery/                       ← screenshots and promo images (+ captions)
 └── .run/                               ← IntelliJ run configurations
@@ -141,17 +144,14 @@ How the build works: `common` is compiled against vanilla Minecraft, using ModDe
 Each loader project then compiles the `common` sources again together with its own code and produces **one self-contained jar**.
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a Minecraft version, a language or a feature.
 
-## Putting the project on GitHub
+## Continuous integration and releases
 
-Run `scripts/setup-git.bat` once (or `scripts/setup-git.sh`). It creates the Git repository with a first commit and
-installs the CI workflow into `.github/workflows/`. It does not push anything. Then:
-
-```bash
-git remote add origin https://github.com/alexkond12/VillageCensus.git
-git push -u origin main
-```
-
-From then on, every push builds and tests all 9 jars on GitHub Actions and attaches them to the run.
+* Every push and pull request builds and tests all 9 jars on GitHub Actions (`.github/workflows/build.yml`);
+  the jars are attached to each run as artifacts.
+* Pushing a version tag such as `v1.0.1` runs `.github/workflows/release.yml`: it builds every loader for every
+  Minecraft version and publishes a [GitHub release](https://github.com/alexkond12/VillageCensus/releases) with the
+  9 jars. The release notes come from the matching section of [CHANGELOG.md](CHANGELOG.md). See
+  [CONTRIBUTING.md](CONTRIBUTING.md#releasing).
 
 ## License
 

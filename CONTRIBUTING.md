@@ -35,7 +35,7 @@ before the item gets a chance to react.
 1. Copy `versions/26.3.properties` to `versions/<new>.properties` and update every version in it
    (links to the version lists are in the file).
 2. Build it: `./gradlew build -Pmc_target=<new>` and fix compile errors in `common/` first.
-3. Add the version to `scripts/build-all.*`, the CI workflow (`.github/workflows/build.yml`, template in `ci/`) and the table in `README.md`.
+3. Add the version to `scripts/build-all.*`, both workflows (`.github/workflows/build.yml` and `release.yml`), `scripts/release-notes.sh` and the table in `README.md`.
 4. Optionally add IntelliJ run configurations in `.run/` (copy an existing file and change `-Pmc_target`).
 5. Change the default `mc_target` in `gradle.properties` if the new version should become the default.
 
@@ -52,6 +52,13 @@ To add a language: add a new block to `scripts/translations.py`, run it and add 
 
 ## Releasing
 
-1. Bump `mod_version` in `gradle.properties` and add an entry to `CHANGELOG.md`.
-2. Run `scripts/build-all.bat` (Windows) or `scripts/build-all.sh`. All jars end up in `dist/`.
-3. Test at least one jar per loader in a real launcher.
+1. Bump `mod_version` in `gradle.properties` and add a `## [x.y.z] - date` section to `CHANGELOG.md`.
+2. Build and test locally: `scripts/build-all.bat` (Windows) or `scripts/build-all.sh`, then try at least one jar per
+   loader in a real launcher.
+3. Commit, then tag and push:
+   ```bash
+   git tag -a v1.0.1 -m "Village Census 1.0.1"
+   git push origin main v1.0.1
+   ```
+   The **Release** workflow checks that the tag matches `mod_version`, builds all 9 jars and publishes the GitHub
+   release with the notes from `CHANGELOG.md` (preview them with `scripts/release-notes.sh 1.0.1`).
