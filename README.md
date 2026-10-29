@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="common/src/main/resources/assets/villagecensus/icon.png" width="96" alt="Village Census icon">
+  <img src="docs/gallery/01_banner.png" alt="Village Census: Know what your villagers know">
 </p>
 
 <h1 align="center">Village Census</h1>
@@ -24,6 +24,23 @@ who has a bed, who has a job, who slept recently and who is able to summon an ir
 | **Right-click** | A report in chat about the village within 48 blocks: villagers (adults/children), professions, beds and workstations (total / claimed / free), how many villagers are ready to breed and to summon an iron golem, iron golems nearby, and advice on what to fix. |
 | **Sneak + right-click** | Free beds (green sparkles) and free workstations (white sparks) are highlighted for 10 seconds. Only you see them. |
 | **Right-click a villager** | A card for that villager: profession and level, coordinates of its bed and workstation, when it last slept, whether it can breed and whether it can summon a golem (and if not, why). The trading screen does not open. |
+
+<p align="center">
+  <img src="docs/gallery/02_features.png" alt="The three ways to use the Census Ledger">
+</p>
+
+### Gallery
+
+| | |
+|---|---|
+| ![Village report in chat](docs/gallery/03_village_report.png) | ![Villager card](docs/gallery/04_villager_card.png) |
+| **Right-click:** the village report | **Right-click a villager:** its card |
+| ![Free beds and workstations highlighted](docs/gallery/05_free_beds_and_workstations.png) | ![Crafting recipe and tooltip](docs/gallery/06_crafting_recipe.png) |
+| **Sneak + right-click:** free beds and workstations | **Recipe:** book + emerald + feather + ink sac |
+
+All screenshots are taken in an unmodified game with only Village Census (and Fabric API) installed, no shaders or resource packs.
+The images in `docs/gallery/` are ready to upload to Modrinth or CurseForge; suggested captions are in
+[docs/gallery/CAPTIONS.md](docs/gallery/CAPTIONS.md).
 
 **Recipe (shapeless):** Book + Emerald + Feather + Ink Sac → Census Ledger.
 The ledger is also in the *Tools & Utilities* creative tab.
@@ -116,6 +133,7 @@ VillageCensus/
 ├── scripts/                            ← build-all, one-time git setup, translation generator
 ├── ci/github-workflow-build.yml        ← GitHub Actions workflow (installed by scripts/setup-git)
 ├── docs/TESTING.md                     ← in-game test checklist
+├── docs/gallery/                       ← screenshots and promo images (+ captions)
 └── .run/                               ← IntelliJ run configurations
 ```
 

@@ -11,4 +11,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Sneak + right-click: highlights free beds and workstations for 10 seconds, visible only to the user.
 - Right-click on a villager: villager card with profession, level, bed, workstation, last sleep, breeding and golem status.
 - Translations into 15 languages.
+- Vanilla-style item texture and mod icon.
+- Gallery: screenshots, banner and feature picture in `docs/gallery/`.
 - Builds for Fabric, NeoForge and Forge on Minecraft 26.1.2, 26.2 and 26.3.
