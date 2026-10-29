@@ -1,0 +1,77 @@
+// =====================================================================================
+//  Applied to every sub-project (common + loaders).
+//  Java toolchain, archive naming, manifest and metadata placeholder expansion.
+// =====================================================================================
+plugins {
+    id 'java-library'
+}
+
+group = mod_group
+version = "${mod_version}+mc${minecraft_version}"
+
+base {
+    // e.g. villagecensus-fabric-1.0.0+mc26.3.jar
+    archivesName = "${mod_id}-${project.name}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = java_version as int
+}
+
+tasks.withType(Jar).configureEach {
+    // Ship the licence inside every jar.
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${mod_id}" }
+    }
+}
+
+tasks.named('jar', Jar) {
+    manifest {
+        attributes([
+                'Specification-Title'   : mod_name,
+                'Specification-Vendor'  : mod_author,
+                'Specification-Version' : project.version,
+                'Implementation-Title'  : "${mod_name} (${project.name})",
+                'Implementation-Version': project.version,
+                'Implementation-Vendor' : mod_author,
+                'Built-On-Minecraft'    : minecraft_version
+        ])
+    }
+}
+
+// Placeholders like ${mod_id} in metadata files are replaced at build time.
+tasks.named('processResources', ProcessResources) {
+    def props = [
+            'mod_id'                   : mod_id,
+            'mod_name'                 : mod_name,
+            'mod_version'              : project.version,
+            'mod_author'               : mod_author,
+            'mod_license'              : mod_license,
+            'mod_description'          : mod_description,
+            'mod_homepage'             : mod_homepage,
+            'mod_issues'               : mod_issues,
+            'java_version'             : java_version,
+            'minecraft_version'        : minecraft_version,
+            'fabric_minecraft_range'   : fabric_minecraft_range,
+            'mods_toml_minecraft_range': mods_toml_minecraft_range,
+            'fabric_loader_version'    : fabric_loader_version,
+            'neoforge_version'         : neoforge_version,
+            'neoforge_loader_range'    : neoforge_loader_range,
+            'forge_loader_range'       : forge_loader_range,
+            'forge_pack_format'        : forge_pack_format,
+    ]
+    inputs.properties(props)
+    filesMatching(['fabric.mod.json', 'META-INF/neoforge.mods.toml', 'META-INF/mods.toml', 'pack.mcmeta']) {
+        expand(props)
+    }
+}

@@ -1,0 +1,40 @@
+// =====================================================================================
+//  :fabric — Fabric entry point and Fabric-specific glue (registration, events).
+// =====================================================================================
+plugins {
+    id 'villagecensus.loader-conventions'
+    id 'net.fabricmc.fabric-loom'
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${minecraft_version}")
+    implementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${fabric_api_version}")
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName('Fabric Client')
+            ideConfigGenerated(false)
+            runDir('runs/client')
+        }
+        server {
+            server()
+            setConfigName('Fabric Server')
+            ideConfigGenerated(false)
+            runDir('runs/server')
+        }
+    }
+}
+
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'includeInternal', 'modCompileClasspath'].each { variant ->
+    configurations.matching { it.name == variant }.configureEach { attributes { attribute(loaderAttribute, 'fabric') } }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
+        configurations.named(variant) { attributes { attribute(loaderAttribute, 'fabric') } }
+    }
+}

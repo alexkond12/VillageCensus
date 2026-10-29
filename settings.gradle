@@ -1,0 +1,59 @@
+// =====================================================================================
+//  Village Census — Gradle settings
+//
+//  One source tree, three loaders (Fabric / NeoForge / Forge) and several Minecraft
+//  versions. The Minecraft version to build against is chosen with the `mc_target`
+//  Gradle property (default: see gradle.properties). Every target has its own file in
+//  `versions/<mc_target>.properties` with the exact dependency versions.
+//
+//      gradlew build                      -> builds all loaders for the default target
+//      gradlew build -Pmc_target=26.1.2   -> builds all loaders for Minecraft 26.1.2
+//      gradlew buildAllTargets            -> builds every target into ./dist
+// =====================================================================================
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        exclusiveContent {
+            forRepository { maven { name = 'Fabric'; url = uri('https://maven.fabricmc.net') } }
+            filter { includeGroupAndSubgroups('net.fabricmc') }
+        }
+        exclusiveContent {
+            forRepository { maven { name = 'MinecraftForge'; url = uri('https://maven.minecraftforge.net') } }
+            filter { includeGroupAndSubgroups('net.minecraftforge') }
+        }
+    }
+}
+
+plugins {
+    // Lets Gradle download a matching JDK 25 automatically if none is installed.
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+// ---- Resolve the Minecraft target and load its version catalogue -------------------
+def mcTarget = providers.gradleProperty('mc_target').get()
+def versionFile = file("versions/${mcTarget}.properties")
+if (!versionFile.isFile()) {
+    def known = file('versions').listFiles().findAll { it.name.endsWith('.properties') }
+            .collect { it.name - '.properties' }.sort()
+    throw new GradleException("Unknown mc_target '${mcTarget}'. Known targets: ${known.join(', ')}")
+}
+def targetProps = new Properties()
+versionFile.withReader('UTF-8') { targetProps.load(it) }
+
+// Make every key of versions/<target>.properties available as a project property
+// (e.g. `minecraft_version`, `fabric_api_version`) in every build script.
+gradle.beforeProject { Project p ->
+    targetProps.each { k, v -> p.ext.set(k as String, v) }
+}
+
+rootProject.name = 'VillageCensus'
+includeBuild('build-logic')
+
+// Loaders can be skipped with -Pvc_loaders=fabric,neoforge (useful while iterating).
+def loaders = providers.gradleProperty('vc_loaders').getOrElse('fabric,neoforge,forge')
+        .split(',').collect { it.trim() }.findAll { !it.isEmpty() }
+
+include('common')
+loaders.each { include(it) }

@@ -1,0 +1,29 @@
+// =====================================================================================
+//  Village Census — root build script
+//  Plugins are declared here (but not applied) so that every sub-project shares the
+//  same plugin versions. Per-project logic lives in build-logic/ (convention plugins)
+//  and in each sub-project's own build.gradle.
+// =====================================================================================
+
+plugins {
+    // Fabric: https://maven.fabricmc.net/net/fabricmc/fabric-loom/
+    id 'net.fabricmc.fabric-loom' version '1.19.3' apply false
+    // NeoForge (also used by 'common' in vanilla mode): https://projects.neoforged.net/neoforged/moddevgradle
+    id 'net.neoforged.moddev' version '2.0.148' apply false
+    // Forge: https://maven.minecraftforge.net/net/minecraftforge/gradle/
+    id 'net.minecraftforge.gradle' version '7.0.40' apply false
+}
+
+// Finished jars of every loader are copied here by each loader's `build` task.
+tasks.register('cleanDist', Delete) {
+    group = 'village census'
+    description = 'Deletes the ./dist folder with the collected release jars.'
+    delete rootProject.layout.projectDirectory.dir('dist')
+}
+
+tasks.register('printTarget') {
+    group = 'village census'
+    description = 'Prints the Minecraft version this build is configured for.'
+    def mc = minecraft_version
+    doLast { println "Village Census is configured for Minecraft ${mc}" }
+}

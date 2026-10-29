@@ -1,0 +1,50 @@
+// =====================================================================================
+//  :common — loader-independent code and resources.
+//  Compiled against plain (vanilla) Minecraft via ModDevGradle's NeoForm mode.
+//  Its sources are compiled again inside each loader project (see build-logic).
+// =====================================================================================
+plugins {
+    id 'villagecensus.java-conventions'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    neoFormVersion = neo_form_version
+}
+
+dependencies {
+    testImplementation(platform('org.junit:junit-bom:5.13.4'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+    testImplementation('com.google.code.gson:gson:2.13.1')
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    // Lets the translation tests find the language files.
+    systemProperty 'villagecensus.langDir', file('src/main/resources/assets/villagecensus/lang').absolutePath
+    // Lets the data file tests find recipes, advancements, models and textures.
+    systemProperty 'villagecensus.resourcesDir', file('src/main/resources').absolutePath
+    testLogging { events 'passed', 'skipped', 'failed'; exceptionFormat 'full' }
+}
+
+// ---- Expose sources/resources to the loader projects ---------------------------------
+configurations {
+    commonJava { canBeResolved = false; canBeConsumed = true }
+    commonResources { canBeResolved = false; canBeConsumed = true }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements'].each { variant ->
+    configurations.named(variant) { attributes { attribute(loaderAttribute, 'common') } }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
+        configurations.named(variant) { attributes { attribute(loaderAttribute, 'common') } }
+    }
+}

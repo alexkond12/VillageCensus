@@ -1,0 +1,4 @@
+// Convention plugins shared by the sub-projects (see src/main/groovy).
+plugins {
+    id 'groovy-gradle-plugin'
+}

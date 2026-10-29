@@ -1,0 +1,34 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-home/
+
+# Release jars collected by the build
+dist/
+
+# Minecraft run folders
+runs/
+run/
+run-data/
+
+# IDEs
+.idea/
+!.idea/icon.png
+*.iml
+*.ipr
+*.iws
+out/
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated data
+**/src/generated/resources/.cache/

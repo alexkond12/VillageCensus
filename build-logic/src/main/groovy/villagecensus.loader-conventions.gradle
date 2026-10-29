@@ -1,0 +1,49 @@
+// =====================================================================================
+//  Applied to every loader project (fabric / neoforge / forge).
+//  Compiles the shared code from :common directly into the loader jar, so each loader
+//  produces ONE self-contained jar, and copies the finished jar into ./dist.
+// =====================================================================================
+plugins {
+    id 'villagecensus.java-conventions'
+}
+
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+
+configurations {
+    commonJava { canBeResolved = true; canBeConsumed = false }
+    commonResources { canBeResolved = true; canBeConsumed = false }
+}
+
+dependencies {
+    // Lets the IDE see :common classes; the sources themselves are compiled below.
+    compileOnly(project(':common')) {
+        attributes { attribute(loaderAttribute, 'common') }
+    }
+    commonJava(project(path: ':common', configuration: 'commonJava'))
+    commonResources(project(path: ':common', configuration: 'commonResources'))
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+}
+
+tasks.named('processResources', ProcessResources) {
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+tasks.named('sourcesJar', Jar) {
+    dependsOn(configurations.commonJava, configurations.commonResources)
+    from(configurations.commonJava)
+    from(configurations.commonResources)
+}
+
+// ---- Collect the release jar into <root>/dist ----------------------------------------
+def copyToDist = tasks.register('copyJarToDist', Copy) {
+    group = 'village census'
+    description = 'Copies the finished mod jar into the root dist/ folder.'
+    from(tasks.named('jar'))
+    into(rootProject.layout.projectDirectory.dir('dist'))
+}
+tasks.named('build') { finalizedBy(copyToDist) }

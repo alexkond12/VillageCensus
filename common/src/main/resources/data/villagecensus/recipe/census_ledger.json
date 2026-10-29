@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:book",
+    "minecraft:emerald",
+    "minecraft:feather",
+    "minecraft:ink_sac"
+  ],
+  "result": {
+    "id": "villagecensus:census_ledger"
+  }
+}
